@@ -50,8 +50,6 @@ const BoardPiece: React.FunctionComponent<ChessPieceProps> = ({
 const BoardPieceBox = styled.div`
   position: relative;
   background-color: #ddb35b;
-  min-width: 20px;
-  min-height: 20px;
 `;
 
 const Stone = styled.img`

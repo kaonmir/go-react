@@ -26,11 +26,6 @@ class Board extends React.Component<Props, States> {
     const { board, turn } = this.props;
     this.setState({ board, turn });
   }
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.log("error: " + error);
-    console.log("errorInfo: " + errorInfo);
-    this.props.onError(error);
-  }
 
   onClick = (cur: number) => {
     const { board, onClick, onError } = this.props;
