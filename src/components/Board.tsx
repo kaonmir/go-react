@@ -14,17 +14,26 @@ interface Props {
 interface States {
   board: STONE[];
   turn: STONE;
+  screenSize: number;
 }
 
 class Board extends React.Component<Props, States> {
   state = {
     board: [],
     turn: STONE.BLACK,
+    screenSize: window.innerWidth,
   };
+
+  handleResize = () => this.setState({ screenSize: window.innerWidth });
 
   componentDidMount() {
     const { board, turn } = this.props;
     this.setState({ board, turn });
+    window.addEventListener("resize", this.handleResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.handleResize);
   }
 
   onClick = (cur: number) => {
@@ -41,7 +50,13 @@ class Board extends React.Component<Props, States> {
 
   displayMap = () =>
     this.props.board.map((stone, cur) => (
-      <BoardPiece key={cur} cur={cur} stone={stone} onClick={this.onClick} />
+      <BoardPiece
+        key={cur}
+        cur={cur}
+        stone={stone}
+        screenSize={this.state.screenSize}
+        onClick={this.onClick}
+      />
     ));
 
   render() {

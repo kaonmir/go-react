@@ -9,15 +9,17 @@ export interface ChessPieceProps {
   cur: number;
   stone?: STONE;
   onClick: (index: number) => void;
+  screenSize: number;
 }
 
 const BoardPiece: React.FunctionComponent<ChessPieceProps> = ({
   cur,
   stone,
   onClick,
+  screenSize,
 }) => {
   const BOARD_MAX = 19;
-  const BOARD_LINESIZE = 4;
+  const BOARD_LINESIZE = screenSize >= 500 ? 3 : 1.5;
   const CENTER_POINTS = [60, 66, 72, 174, 180, 186, 288, 294, 300];
 
   const top = Math.floor(cur / BOARD_MAX) !== 0;
