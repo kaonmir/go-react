@@ -5,7 +5,7 @@ type Point = {
 
 export default Point;
 export const isOutBoard = ({ x, y }: Point) =>
-  x < 0 || 19 < x || y < 0 || 19 < y;
+  x < 0 || 19 <= x || y < 0 || 19 <= y;
 export const convertToPoint = (cur: number): Point => ({
   x: Math.floor(cur / 19),
   y: cur % 19,
