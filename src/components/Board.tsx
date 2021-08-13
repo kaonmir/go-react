@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { move } from "../services/go";
 import STONE, { getOtherSTONE } from "../services/STONE";
@@ -11,58 +12,40 @@ interface Props {
   onError: (e: Error) => void;
 }
 
-interface States {
-  board: STONE[];
-  turn: STONE;
-  screenSize: number;
-}
+const Board: React.FunctionComponent<Props> = (props) => {
+  const [board, setBoard] = useState<STONE[]>([]);
+  const [turn, setTurn] = useState<STONE>(STONE.BLACK);
+  const [screenSize, setScreenSize] = useState<number>(window.innerWidth);
 
-class Board extends React.Component<Props, States> {
-  state = {
-    board: [],
-    turn: STONE.BLACK,
-    screenSize: window.innerWidth,
-  };
+  useEffect(() => setBoard(props.board), [props.board]);
 
-  handleResize = () => this.setState({ screenSize: window.innerWidth });
+  useEffect(() => {
+    const handleResize = () => setScreenSize(window.innerWidth);
 
-  componentDidMount() {
-    const { board, turn } = this.props;
-    this.setState({ board, turn });
-    window.addEventListener("resize", this.handleResize);
-  }
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.handleResize);
-  }
-
-  onClick = (cur: number) => {
-    const { board, onClick, onError } = this.props;
-    const { turn } = this.state;
+  const onClick = (cur: number) => {
     try {
       const count = move(board, cur, turn);
-      onClick(cur, count);
-      this.setState({ board, turn: getOtherSTONE(turn) });
+      props.onClick(cur, count);
+
+      setBoard(board);
+      setTurn(getOtherSTONE(turn));
     } catch (e) {
-      onError(e);
+      props.onError(e);
     }
   };
 
-  displayMap = () =>
-    this.props.board.map((stone, cur) => (
-      <BoardPiece
-        key={cur}
-        cur={cur}
-        stone={stone}
-        screenSize={this.state.screenSize}
-        onClick={this.onClick}
-      />
-    ));
-
-  render() {
-    return <BoardBox>{this.displayMap()}</BoardBox>;
-  }
-}
+  return (
+    <BoardBox>
+      {board.map((stone, cur) => (
+        <BoardPiece key={cur} {...{ cur, stone, screenSize, onClick }} />
+      ))}
+    </BoardBox>
+  );
+};
 
 const BoardBox = styled.div`
   display: inline-grid;

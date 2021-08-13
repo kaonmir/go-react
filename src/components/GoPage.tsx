@@ -4,8 +4,6 @@ import { initBoard } from "../services/go";
 import STONE, { getOtherSTONE } from "../services/STONE";
 import Board from "./Board";
 
-interface Props {}
-
 interface States {
   board: STONE[];
   counts: { [id: number]: number };
@@ -15,9 +13,10 @@ interface States {
   errorVisible: Boolean;
 }
 
-// const initBoardString = "30 10 60 100";
+// const initFormat = "30 10 60 100";
+const initFormat = "";
 
-class GoPage extends React.Component<Props, States> {
+class GoPage extends React.Component<{}, States> {
   state = {
     board: [],
     counts: {
@@ -31,7 +30,6 @@ class GoPage extends React.Component<Props, States> {
   };
 
   componentDidMount() {
-    const initFormat = "";
     const boardProps = initBoard(initFormat);
     this.setState({ ...boardProps, log: initFormat });
   }
@@ -40,7 +38,6 @@ class GoPage extends React.Component<Props, States> {
     const { log, counts, turn } = this.state;
     counts[turn] += count;
 
-    console.log(`${log} ${cur}`);
     this.setState({ log: `${log} ${cur}`, counts, turn: getOtherSTONE(turn) });
   };
 
