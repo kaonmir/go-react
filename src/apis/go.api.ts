@@ -6,8 +6,6 @@ interface Go {
 }
 
 export async function getids(): Promise<string[]> {
-  console.log(config);
-
   return await fetch(`${config.SERVER_URL}/api/go`)
     .then((res) => res.json())
     .then((gos: Go[]) => gos.map((go) => go.id));
@@ -28,8 +26,6 @@ export async function getGoById(id: string): Promise<Go> {
 }
 
 export async function patchGoById(id: string, logs: string): Promise<Go> {
-  console.log(`${config.SERVER_URL}/api/go`);
-
   return await fetch(`${config.SERVER_URL}/api/go`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },

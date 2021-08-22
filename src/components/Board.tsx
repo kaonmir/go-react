@@ -1,8 +1,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { move } from "../services/go";
-import STONE, { getOtherSTONE } from "../services/STONE";
+import STONE from "../services/STONE";
 import BoardPiece from "./BoardPiece";
 
 interface Props {
