@@ -1,55 +1,87 @@
 import * as React from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { initBoard } from "../services/go";
+import { createGo, getGoById, getids, patchGoById } from "../apis/go.api";
+import * as goService from "../services/go";
 import STONE, { getOtherSTONE } from "../services/STONE";
 import Board from "./Board";
+import GoPageSide from "./Sidebar";
 
-interface States {
-  board: STONE[];
-  counts: { [id: number]: number };
-  turn: STONE;
-  log: String;
-  errorMessage: String;
-  errorVisible: Boolean;
-}
+const GoPage: React.FunctionComponent = (props) => {
+  const [board, setBoard] = useState<STONE[]>([]);
+  const [counts, setCounts] = useState<{ [id: number]: number }>({
+    [STONE.WHITE]: 0,
+    [STONE.BLACK]: 0,
+  });
+  const [turn, setTurn] = useState<STONE>(STONE.BLACK);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [errorVisible, setErrorVisible] = useState(false);
 
-// const initFormat = "30 10 60 100";
-const initFormat = "";
+  const [ids, setIds] = useState<string[]>([]);
 
-class GoPage extends React.Component<{}, States> {
-  state = {
-    board: [],
-    counts: {
-      [STONE.WHITE]: 0,
-      [STONE.BLACK]: 0,
-    },
-    turn: STONE.BLACK,
-    log: "",
-    errorMessage: "",
-    errorVisible: false,
+  const [id, setId] = useState("");
+  const [logs, setLogs] = useState("");
+
+  const initBoard = (logs: string) => {
+    const boardProps = goService.initBoard(logs);
+    setLogs(logs);
+    setBoard(boardProps.board);
+    setCounts(boardProps.counts);
+    setTurn(boardProps.turn);
   };
 
-  componentDidMount() {
-    const boardProps = initBoard(initFormat);
-    this.setState({ ...boardProps, log: initFormat });
-  }
+  useEffect(() => {
+    getids().then((ids) => setIds(ids));
+    initBoard("");
+  }, []);
 
-  onClick = (cur: number, count: number) => {
-    const { log, counts, turn } = this.state;
-    counts[turn] += count;
+  const onClickBoard = (cur: number) => {
+    try {
+      const count = goService.move(board, cur, turn);
+      counts[turn] += count;
+      setCounts(counts);
+      setBoard(board);
+      setTurn(getOtherSTONE(turn));
+      setLogs(`${logs} ${cur}`);
+    } catch (e) {
+      onError(e);
+      return;
+    }
 
-    this.setState({ log: `${log} ${cur}`, counts, turn: getOtherSTONE(turn) });
+    if (logs === "") {
+      createGo(`${cur}`).then((go) => {
+        setIds([...ids, go.id]);
+        setId(go.id);
+      });
+    }
   };
 
-  onError = (e: Error) => {
-    this.setState({ errorMessage: e.message, errorVisible: true });
-    setTimeout(() => this.setState({ errorVisible: false }), 2000);
+  const onClickSidebard = (id: string) => {
+    setId(id);
+    getGoById(id).then((go) => initBoard(go.logs));
   };
 
-  render() {
-    const { board, counts, turn, errorMessage, errorVisible } = this.state;
-    return (
-      <GoPageBox>
+  const onClickSave = () => {
+    patchGoById(id, logs).then((go) => {
+      alert("save successfully!!");
+    });
+  };
+
+  const onError = (e: Error) => {
+    setErrorMessage(e.message);
+    setErrorVisible(true);
+    setTimeout(() => setErrorVisible(false), 2000);
+  };
+
+  return (
+    <GoPageBox>
+      <GoPageSide
+        id={id}
+        ids={ids}
+        onClick={onClickSidebard}
+        onSave={onClickSave}
+      />
+      <GoPageContent>
         <ErrorBox {...{ errorVisible }}>{errorMessage}</ErrorBox>
         <ScoreBox>
           BLACK {counts[STONE.BLACK]} : {counts[STONE.WHITE]} WHITE
@@ -58,21 +90,24 @@ class GoPage extends React.Component<{}, States> {
           <Board
             board={board}
             turn={turn}
-            onClick={this.onClick}
-            onError={this.onError}
+            onClick={onClickBoard}
+            onError={onError}
           />
         </BoardBox>
-      </GoPageBox>
-    );
-  }
-}
+      </GoPageContent>
+    </GoPageBox>
+  );
+};
 
 const GoPageBox = styled.div`
+  display: flex;
+  align-items: center;
+`;
+const GoPageContent = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100vw;
   height: 100vh;
   min-width: 400px;
   min-height: 400px;
