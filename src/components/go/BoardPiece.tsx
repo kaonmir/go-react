@@ -1,9 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
-import STONE from "../services/STONE";
+import STONE from "../../services/STONE";
 
-import BLACK_STONE from "../assets/Black_Stone.png";
-import WHITE_STONE from "../assets/White_Stone.png";
+import BLACK_STONE from "../../assets/Black_Stone.png";
+import WHITE_STONE from "../../assets/White_Stone.png";
 
 export interface ChessPieceProps {
   cur: number;

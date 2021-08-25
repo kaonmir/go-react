@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import STONE from "../services/STONE";
+import STONE from "../../services/STONE";
 import BoardPiece from "./BoardPiece";
 
 interface Props {

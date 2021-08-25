@@ -3,37 +3,28 @@ import ERROR from "./error.json";
 import { toFourWays } from "./Point";
 import getAlliances from "./bfs";
 
-// Group 을 구현하는 것도 애매하다.
-
-const parseGo = (str: string) =>
-  str
-    .trim()
-    .split(" ")
-    .map((k) => parseInt(k));
-
 // counts: 검은색이 1점 더 먹었다.
 export const initBoard = (
-  str: string
+  logs: number[]
 ): {
   board: STONE[];
   counts: { [id: number]: number };
   turn: STONE;
 } => {
   const board: STONE[] = Array(19 * 19).fill(STONE.EMPTY);
-  const moveLogs: number[] = parseGo(str).filter((k) => !isNaN(k));
 
   const counts = {
     [STONE.BLACK]: 0,
     [STONE.WHITE]: 0,
   };
 
-  moveLogs.forEach((cur, idx) => {
+  logs.forEach((cur, idx) => {
     const turn = idx % 2 === 0 ? STONE.BLACK : STONE.WHITE;
     const capturedStones: number = move(board, cur, turn);
     counts[turn] += capturedStones;
   });
 
-  const turn = moveLogs.length % 2 === 0 ? STONE.BLACK : STONE.WHITE;
+  const turn = logs.length % 2 === 0 ? STONE.BLACK : STONE.WHITE;
   return { board, counts, turn };
 };
 

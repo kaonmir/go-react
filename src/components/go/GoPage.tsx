@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { createGo, getGoById, getids, patchGoById } from "../apis/go.api";
-import * as goService from "../services/go";
-import STONE, { getOtherSTONE } from "../services/STONE";
+import { createGo, getGoById, getAllIds, patchGoById } from "../../apis/go.api";
+import * as goService from "../../services/go";
+import STONE, { getOtherSTONE } from "../../services/STONE";
 import Board from "./Board";
 import GoPageSide from "./Sidebar";
 
@@ -20,9 +20,9 @@ const GoPage: React.FunctionComponent = (props) => {
   const [ids, setIds] = useState<string[]>([]);
 
   const [id, setId] = useState("");
-  const [logs, setLogs] = useState("");
+  const [logs, setLogs] = useState<number[]>([]);
 
-  const initBoard = (logs: string) => {
+  const initBoard = (logs: number[]) => {
     const boardProps = goService.initBoard(logs);
     setLogs(logs);
     setBoard(boardProps.board);
@@ -31,8 +31,8 @@ const GoPage: React.FunctionComponent = (props) => {
   };
 
   useEffect(() => {
-    getids().then((ids) => setIds(ids));
-    initBoard("");
+    getAllIds().then((ids) => setIds(ids));
+    initBoard([]);
   }, []);
 
   const onClickBoard = (cur: number) => {
@@ -42,13 +42,13 @@ const GoPage: React.FunctionComponent = (props) => {
       setCounts(counts);
       setBoard(board);
       setTurn(getOtherSTONE(turn));
-      setLogs(`${logs} ${cur}`);
+      setLogs([...logs, cur]);
     } catch (e) {
       onError(e);
       return;
     }
 
-    if (logs === "") {
+    if (logs.length === 0) {
       createGo(`${cur}`).then((go) => {
         setIds([...ids, go.id]);
         setId(go.id);
